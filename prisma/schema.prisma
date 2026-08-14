@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Like {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+  postId    Int
+
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  comments Comment[]
+  publicKey String? @db.MediumText
+  likes Like[]
+  bio       String?
+  avatar    String?
+  email String? @unique
+  role String @default("user")
+  posts     Post[]
+  notifications        Notification[] @relation("NotificationUser")
+  sentNotifications    Notification[] @relation("NotificationActor")
+  followers Follow[] @relation("Following")
+  following Follow[] @relation("Follower")
+  lastActive DateTime @default(now())
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  devices          Device[]
+}
+model Follow {
+  id          Int  @id @default(autoincrement())
+
+  followerId  Int
+  followingId Int
+
+  follower    User @relation("Follower", fields: [followerId], references: [id])
+  following   User @relation("Following", fields: [followingId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  likes Like[]
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  comments Comment[]
+  notifications Notification[]
+  image String?
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  // Kept only to preserve records written before end-to-end encryption.
+  // New messages must use the encrypted fields below.
+  legacyContent String? @map("content") @db.VarChar(191)
+  encryptedContent String? @db.MediumText
+  encryptedKey String? @db.MediumText
+  senderEncryptedKey String? @db.MediumText
+  createdAt   DateTime @default(now())
+  imageUrl String?
+
+  senderId    Int
+  receiverId  Int
+
+  sender      User @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  iv String? @db.VarChar(191)
+  seen        Boolean @default(false)
+  keyEnvelopes MessageKeyEnvelope[]
+}
+
+model Device {
+  id        String   @id
+  userId    Int
+  publicKey String   @db.MediumText
+  name      String   @default("Browser")
+  approved  Boolean  @default(false)
+  linkCode  String?  @unique
+  createdAt DateTime @default(now())
+  approvedAt DateTime?
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyEnvelopes MessageKeyEnvelope[]
+
+  @@index([userId, approved])
+}
+
+model MessageKeyEnvelope {
+  id           Int    @id @default(autoincrement())
+  messageId    Int
+  deviceId     String
+  encryptedKey String @db.MediumText
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  device  Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, deviceId])
+  @@index([deviceId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+
+  content   String
+
+  userId    Int
+  postId    Int
+
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+  actorId   Int
+
+  type      String
+
+  postId    Int?
+
+  read      Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  user       User @relation("NotificationUser", fields: [userId], references: [id])
+  actor      User @relation("NotificationActor", fields: [actorId], references: [id])
+
+  post       Post? @relation(fields: [postId], references: [id])
+}
+
+model InviteCode {
+  id         Int      @id @default(autoincrement())
+
+  code       String   @unique
+
+  reusable   Boolean  @default(false)
+
+  used       Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+}
