@@ -436,12 +436,10 @@ export default function Home() {
             </button>
             {showNotifications && (
               <>
-                {/* OVERLAY */}
                 <div
                   className="fixed inset-0 z-40"
                   onClick={() => setShowNotifications(false)}
                 />
-                {/* MODAL */}
                 <div
                   onClick={(e) => e.stopPropagation()}
                   className="absolute right-0 top-14 w-[340px] max-w-[calc(100vw-2rem)] bg-zinc-950 border border-zinc-900 rounded-3xl p-3 shadow-2xl z-50"
@@ -564,433 +562,345 @@ export default function Home() {
                 <div className="absolute right-0 top-16 w-52 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden z-50">
                   <button
                     onClick={() => router.push(`/profile/${me?.username}`)}
-                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white cursor-pointer"
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-900 transition"
                   >
                     Profile
                   </button>
-
                   <button
                     onClick={() => router.push("/settings")}
-                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white cursor-pointer"
+                    className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-900 transition"
                   >
                     Settings
                   </button>
-
-                  <div className="h-px bg-zinc-800" />
-
                   <button
                     onClick={() => {
                       localStorage.removeItem("token");
-                      document.cookie =
-                        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                      window.location.href = "/login";
+                      router.push("/login");
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-red-500/10 transition text-sm text-red-400 cursor-pointer"
+                    className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition"
                   >
-                    Log out
+                    Logout
                   </button>
                 </div>
               )}
             </div>
           </div>
         </motion.div>
-        {!token && <p className="text-gray-400">Please login first.</p>}
-        {token && (
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.4,
-            }}
-            className="grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-6"
-          >
-            {/* LEFT */}
-            {/* LEFT */}
-            <div className="hidden md:block">
-              <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-5">
-                <div className="mb-4">
-                  <h2 className="text-xl font-medium text-white">Share</h2>
 
-                  <p className="text-zinc-500 text-sm mt-1">
-                    private thoughts with your network
-                  </p>
-                </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.05 }}
+          className="grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_300px] gap-6"
+        >
+          <div className="hidden lg:block">
+            <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-5 sticky top-6">
+              <div className="text-lg font-medium mb-1">Share</div>
+              <div className="text-sm text-zinc-500 mb-4">
+                private thoughts with your network
+              </div>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="w-full h-32 bg-black/40 border border-zinc-900 rounded-2xl p-4 text-sm outline-none resize-none"
+                placeholder="Write something private..."
+              />
+              <button
+                onClick={createPost}
+                className="mt-3 w-full bg-white text-black py-3 rounded-2xl text-sm font-medium"
+              >
+                Publish
+              </button>
+            </div>
+          </div>
 
-                <textarea
-                  className="w-full bg-black/40 border border-zinc-900 rounded-2xl p-4 outline-none text-white resize-none min-h-[140px]"
-                  placeholder="Write something private..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-                <div className="mt-4">
-                  <label className="bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-2xl text-sm cursor-pointer hover:bg-zinc-800 transition inline-block">
-                    Add Image
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-
-                        if (!file) return;
-
-                        const res = await startUpload([file]);
-
-                        if (res?.[0]?.ufsUrl) {
-                          setPostImage(res[0].ufsUrl);
-                        }
-                      }}
-                    />
-                  </label>
-
-                  {postImage && (
-                    <img
-                      src={postImage}
-                      className="mt-4 rounded-2xl border border-zinc-900 max-h-[400px]"
-                    />
-                  )}
-                </div>
-                <motion.button
-                  whileHover={{
-                    scale: 1.01,
-                  }}
-                  whileTap={{
-                    scale: 0.98,
-                  }}
-                  transition={{
-                    duration: 0.15,
-                  }}
-                  onClick={createPost}
-                  className="mt-4 w-full bg-white text-black py-3 rounded-2xl font-medium hover:opacity-90 transition cursor-pointer"
-                >
-                  Publish
-                </motion.button>
+          <div className="min-w-0">
+            <div className="mb-5">
+              <div className="text-2xl font-medium">Feed</div>
+              <div className="text-sm text-zinc-500">
+                private updates from your network
               </div>
             </div>
-            {/* FEED */}
-            <div>
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h2 className="text-xl font-medium text-white">Feed</h2>
 
-                  <p className="text-zinc-500 text-sm mt-1">
-                    private updates from your network
-                  </p>
-                </div>
-              </div>
-
-              <PullToRefresh
-                onRefresh={async () => {
-                  if (token) {
-                    await fetchPosts(token);
-                    await fetchNotifications(token);
-                  }
-                }}
-              >
-                {" "}
-                <div className="space-y-4">
-                  {postsLoading
-                    ? [...Array(3)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="bg-zinc-950 border border-zinc-900 rounded-3xl p- animate-pulse"
-                        >
-                          <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full bg-zinc-900" />
-
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-4">
-                                <div className="h-4 w-24 rounded bg-zinc-900" />
-                                <div className="h-3 w-16 rounded bg-zinc-900" />
-                              </div>
-
-                              <div className="space-y-2">
-                                <div className="h-4 rounded bg-zinc-900 w-full" />
-                                <div className="h-4 rounded bg-zinc-900 w-[90%]" />
-                                <div className="h-4 rounded bg-zinc-900 w-[70%]" />
-                              </div>
+            <PullToRefresh
+              onRefresh={async () => {
+                if (token) await fetchPosts(token);
+              }}
+            >
+              <div className="space-y-4">
+                {postsLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="bg-zinc-950 border border-zinc-900 rounded-3xl p-5 animate-pulse"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-full bg-zinc-900" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="h-4 w-24 rounded bg-zinc-900" />
+                              <div className="h-3 w-16 rounded bg-zinc-900" />
+                            </div>
+                            <div className="space-y-2">
+                              <div className="h-4 rounded bg-zinc-900 w-full" />
+                              <div className="h-4 rounded bg-zinc-900 w-[90%]" />
+                              <div className="h-4 rounded bg-zinc-900 w-[70%]" />
                             </div>
                           </div>
                         </div>
-                      ))
-                    : posts.map((p) => (
-                        <motion.div
-                          key={p.id}
-                          whileHover={{
-                            y: -2,
-                          }}
-                          transition={{
-                            duration: 0.18,
-                          }}
-                          className="bg-zinc-950 border border-zinc-900 rounded-3xl p-4 md:p-5 hover:border-zinc-800 transition w-full overflow-hidden"
-                        >
-                          <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
-                              {p.user?.avatar ? (
-                                <img
-                                  src={p.user.avatar}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                p.user?.username?.[0]?.toUpperCase()
-                              )}
-                            </div>
+                      </div>
+                    ))
+                  : posts.map((p) => (
+                      <motion.div
+                        key={p.id}
+                        whileHover={{ y: -2 }}
+                        transition={{ duration: 0.18 }}
+                        className="bg-zinc-950 border border-zinc-900 rounded-3xl p-4 md:p-5 hover:border-zinc-800 transition w-full overflow-hidden"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                            {p.user?.avatar ? (
+                              <img
+                                src={p.user.avatar}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              p.user?.username?.[0]?.toUpperCase()
+                            )}
+                          </div>
 
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-2">
-                                <div>
-                                  <a
-                                    href={`/profile/${p.user?.username}`}
-                                    className="text-sm text-white hover:text-zinc-300 transition"
-                                  >
-                                    @{p.user?.username}
-                                  </a>
-
-                                  <div className="text-xs text-zinc-600">
-                                    {formatDistanceToNow(
-                                      new Date(p.createdAt),
-                                      {
-                                        addSuffix: true,
-                                      },
-                                    )}
-                                  </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <a
+                                  href={`/profile/${p.user?.username}`}
+                                  className="text-sm text-white hover:text-zinc-300 transition"
+                                >
+                                  @{p.user?.username}
+                                </a>
+                                <div className="text-xs text-zinc-600">
+                                  {formatDistanceToNow(new Date(p.createdAt), {
+                                    addSuffix: true,
+                                  })}
                                 </div>
-
-                                {p.userId === me?.id && (
-                                  <div className="relative">
-                                    <button
-                                      onClick={() =>
-                                        setOpenMenu(
-                                          openMenu === p.id ? null : p.id,
-                                        )
-                                      }
-                                      className="text-zinc-500 hover:text-white transition text-lg"
-                                    >
-                                      ⋯
-                                    </button>
-
-                                    {openMenu === p.id && (
-                                      <div className="absolute right-0 top-8 w-44 bg-zinc-950 border border-zinc-900 rounded-2xl shadow-2xl overflow-hidden z-50">
-                                        <button
-                                          onClick={() => {
-                                            setEditingPost(p);
-                                            setEditContent(p.content);
-                                            setOpenMenu(null);
-                                          }}
-                                          className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
-                                        >
-                                          {" "}
-                                          Edit Post{" "}
-                                        </button>
-
-                                        <button
-                                          onClick={() => {
-                                            navigator.clipboard.writeText(
-                                              `${window.location.origin}/post/${p.id}`,
-                                            );
-
-                                            toast.success("Link copied");
-
-                                            setOpenMenu(null);
-                                          }}
-                                          className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
-                                        >
-                                          Copy Link
-                                        </button>
-
-                                        <button
-                                          onClick={() => {
-                                            deletePost(p.id);
-                                            setOpenMenu(null);
-                                          }}
-                                          className="w-full text-left px-4 py-3 hover:bg-red-500/10 transition text-sm text-red-400"
-                                        >
-                                          Delete Post
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
                               </div>
 
-                              <div className="text-[15px] leading-7 text-zinc-100 break-words">
-                                {p.content}
-                              </div>
-
-                              {p.image && (
-                                <img
-                                  src={p.image}
-                                  onClick={() => setSelectedImage(p.image)}
-                                  className="mt-5 rounded-2xl md:rounded-3xl border border-zinc-900 w-full h-auto max-h-[420px] object-cover cursor-zoom-in hover:opacity-95 transition"
-                                />
-                              )}
-
-                              <div className="flex items-center gap-5 mt-5">
-                                {/* LIKE */}
-                                <div className="flex items-center gap-2 cursor-pointer">
-                                  <motion.button
-                                    whileTap={{ scale: 1.25 }}
-                                    onClick={() => handleLike(p.id)}
-                                    animate={
-                                      p.likes.some(
-                                        (l: any) => l.userId === me?.id,
-                                      )
-                                        ? { scale: [1, 1.3, 1] }
-                                        : {}
-                                    }
-                                    className={`transition ${
-                                      p.likes.some(
-                                        (l: any) => l.userId === me?.id,
-                                      )
-                                        ? "text-red-500"
-                                        : "text-zinc-500 hover:text-white"
-                                    }`}
-                                  >
-                                    <Heart
-                                      className="cursor-pointer"
-                                      size={18}
-                                      fill={
-                                        p.likes.some(
-                                          (l: any) => l.userId === me?.id,
-                                        )
-                                          ? "currentColor"
-                                          : "none"
-                                      }
-                                    />
-                                  </motion.button>
-
-                                  <div className="text-sm text-zinc-500">
-                                    {p._count.likes}
-                                  </div>
-                                </div>
-
-                                {/* COMMENTS */}
-                                <div className="flex items-center gap-2">
+                              {p.userId === me?.id && (
+                                <div className="relative">
                                   <button
-                                    onClick={() => {
-                                      setSelectedPost(p);
-                                      setShowComments(true);
-                                    }}
-                                    className="text-zinc-500 hover:text-white transition cursor-pointer"
+                                    onClick={() =>
+                                      setOpenMenu(
+                                        openMenu === p.id ? null : p.id,
+                                      )
+                                    }
+                                    className="text-zinc-500 hover:text-white transition text-lg"
                                   >
-                                    💬
+                                    ⋯
                                   </button>
 
-                                  <div className="text-sm text-zinc-500">
-                                    {p._count.comments}
-                                  </div>
+                                  {openMenu === p.id && (
+                                    <div className="absolute right-0 top-8 w-44 bg-zinc-950 border border-zinc-900 rounded-2xl shadow-2xl overflow-hidden z-50">
+                                      <button
+                                        onClick={() => {
+                                          setEditingPost(p);
+                                          setEditContent(p.content);
+                                          setOpenMenu(null);
+                                        }}
+                                        className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
+                                      >
+                                        Edit Post
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(
+                                            `${window.location.origin}/post/${p.id}`,
+                                          );
+                                          toast.success("Link copied");
+                                          setOpenMenu(null);
+                                        }}
+                                        className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
+                                      >
+                                        Copy Link
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          deletePost(p.id);
+                                          setOpenMenu(null);
+                                        }}
+                                        className="w-full text-left px-4 py-3 hover:bg-red-500/10 transition text-sm text-red-400"
+                                      >
+                                        Delete Post
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="text-[15px] leading-7 text-zinc-100 break-words">
+                              {p.content}
+                            </div>
+
+                            {p.image && (
+                              <img
+                                src={p.image}
+                                onClick={() => setSelectedImage(p.image)}
+                                className="mt-5 rounded-2xl md:rounded-3xl border border-zinc-900 w-full h-auto max-h-[420px] object-cover cursor-zoom-in hover:opacity-95 transition"
+                              />
+                            )}
+
+                            <div className="flex items-center gap-5 mt-5">
+                              <div className="flex items-center gap-2 cursor-pointer">
+                                <motion.button
+                                  whileTap={{ scale: 1.25 }}
+                                  onClick={() => handleLike(p.id)}
+                                  animate={
+                                    p.likes.some(
+                                      (l: any) => l.userId === me?.id,
+                                    )
+                                      ? { scale: [1, 1.3, 1] }
+                                      : {}
+                                  }
+                                  className={`transition ${
+                                    p.likes.some(
+                                      (l: any) => l.userId === me?.id,
+                                    )
+                                      ? "text-red-500"
+                                      : "text-zinc-500 hover:text-white"
+                                  }`}
+                                >
+                                  <Heart
+                                    className="cursor-pointer"
+                                    size={18}
+                                    fill={
+                                      p.likes.some(
+                                        (l: any) => l.userId === me?.id,
+                                      )
+                                        ? "currentColor"
+                                        : "none"
+                                    }
+                                  />
+                                </motion.button>
+                                <div className="text-sm text-zinc-500">
+                                  {p._count.likes}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setSelectedPost(p);
+                                    setShowComments(true);
+                                  }}
+                                  className="text-zinc-500 hover:text-white transition cursor-pointer"
+                                >
+                                  💬
+                                </button>
+                                <div className="text-sm text-zinc-500">
+                                  {p._count.comments}
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </motion.div>
-                      ))}
-                </div>
-              </PullToRefresh>
-            </div>
-            {/* USERS */}
-            <div className="hidden xl:block">
-              <div className="mb-5">
-                <h2 className="text-xl font-medium text-white">Discover</h2>
-
-                <p className="text-zinc-500 text-sm mt-1">
-                  connect privately with people
-                </p>
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search users..."
-                  className="w-full mt-4 bg-black/40 border border-zinc-900 rounded-2xl px-4 py-3 text-sm outline-none"
-                />
-              </div>
-
-              <div className="space-y-3">
-                {filteredUsers.map((u) => (
-                  <div
-                    key={u.id}
-                    className="bg-zinc-950 border border-zinc-900 rounded-3xl p-4 flex items-center justify-between hover:border-zinc-800 transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
-                        {u.avatar ? (
-                          <img
-                            src={u.avatar}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          u.username[0].toUpperCase()
-                        )}
-                      </div>
-
-                      <div>
-                        <a
-                          href={`/profile/${u.username}`}
-                          className="text-sm text-white hover:text-zinc-300 transition"
-                        >
-                          @{u.username}
-                        </a>
-
-                        <div className="text-xs text-zinc-500 mt-0.5">
-                          available on quiet
                         </div>
+                      </motion.div>
+                    ))}
+              </div>
+            </PullToRefresh>
+          </div>
+
+          <div className="hidden xl:block">
+            <div className="mb-5">
+              <div className="text-2xl font-medium">Discover</div>
+              <div className="text-sm text-zinc-500">
+                connect privately with people
+              </div>
+            </div>
+
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search users..."
+              className="w-full bg-black/40 border border-zinc-900 rounded-2xl px-4 py-3 text-sm outline-none mb-4"
+            />
+
+            <div className="space-y-3">
+              {filteredUsers.map((u) => (
+                <div
+                  key={u.id}
+                  className="bg-zinc-950 border border-zinc-900 rounded-3xl p-4 flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                      {u.avatar ? (
+                        <img
+                          src={u.avatar}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        u.username?.[0]?.toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <a
+                        href={`/profile/${u.username}`}
+                        className="text-sm text-white hover:text-zinc-300 transition"
+                      >
+                        @{u.username}
+                      </a>
+                      <div className="text-xs text-zinc-500 mt-0.5">
+                        available on quiet
                       </div>
                     </div>
-
-                    <motion.button
-                      whileHover={{
-                        scale: followingLoading === u.id ? 1 : 1.03,
-                      }}
-                      whileTap={{
-                        scale: followingLoading === u.id ? 1 : 0.96,
-                      }}
-                      transition={{
-                        duration: 0.15,
-                      }}
-                      onClick={() => followUser(u.id)}
-                      disabled={followingLoading === u.id}
-                      className={`px-5 py-2 rounded-2xl text-sm font-medium transition ${
-                        followingUsers[u.id]
-                          ? "bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800"
-                          : "bg-white text-black hover:opacity-90"
-                      } ${
-                        followingLoading === u.id
-                          ? "opacity-60 cursor-wait"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      {followingLoading === u.id
-                        ? "..."
-                        : followingUsers[u.id]
-                          ? "Following"
-                          : "Follow"}
-                    </motion.button>
                   </div>
-                ))}
-              </div>
+
+                  <motion.button
+                    whileHover={{
+                      scale: followingLoading === u.id ? 1 : 1.03,
+                    }}
+                    whileTap={{
+                      scale: followingLoading === u.id ? 1 : 0.96,
+                    }}
+                    transition={{ duration: 0.15 }}
+                    onClick={() => followUser(u.id)}
+                    disabled={followingLoading === u.id}
+                    className={`px-5 py-2 rounded-2xl text-sm font-medium transition ${
+                      followingUsers[u.id]
+                        ? "bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800"
+                        : "bg-white text-black hover:opacity-90"
+                    } ${
+                      followingLoading === u.id
+                        ? "opacity-60 cursor-wait"
+                        : "cursor-pointer"
+                    }`}
+                  >
+                    {followingLoading === u.id
+                      ? "..."
+                      : followingUsers[u.id]
+                        ? "Following"
+                        : "Follow"}
+                  </motion.button>
+                </div>
+              ))}
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
+
         <button
           onClick={() => setShowMobilePost(true)}
           className="fixed bottom-28 right-4 z-50 md:hidden w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-2xl shadow-2xl"
         >
           +
         </button>
+
         {showMobilePost && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm md:hidden flex items-end">
-            <div className="w-full bg-zinc-950 border-t border-zinc-900 rounded-t-3xl p-5">
+          <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm md:hidden flex items-end">
+            <div className="w-full max-h-[calc(100dvh-5rem)] overflow-y-auto bg-zinc-950 border-t border-zinc-900 rounded-t-3xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
               <div className="flex items-center justify-between mb-5">
                 <div className="text-lg text-white font-medium">New Post</div>
-
                 <button
                   onClick={() => setShowMobilePost(false)}
-                  className="text-zinc-500"
+                  className="text-zinc-500 hover:text-white transition"
                 >
                   ✕
                 </button>
@@ -1004,8 +914,8 @@ export default function Home() {
               />
 
               <button
-                onClick={() => {
-                  createPost();
+                onClick={async () => {
+                  await createPost();
                   setShowMobilePost(false);
                 }}
                 className="mt-4 w-full bg-white text-black py-3 rounded-2xl font-medium"
@@ -1015,52 +925,24 @@ export default function Home() {
             </div>
           </div>
         )}
+
         {showComments && selectedPost && (
           <motion.div
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            exit={{
-              opacity: 0,
-            }}
-            transition={{
-              duration: 0.2,
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-end md:items-center justify-center"
           >
             <motion.div
-              initial={{
-                y: 80,
-                opacity: 0,
-              }}
-              animate={{
-                y: 0,
-                opacity: 1,
-              }}
-              exit={{
-                y: 80,
-                opacity: 0,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-              }}
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
               className="w-full md:max-w-2xl h-[85vh] md:h-[80vh] bg-zinc-950 border border-zinc-900 rounded-t-3xl md:rounded-3xl flex flex-col overflow-hidden"
             >
-              {/* HEADER */}
               <div className="flex items-center justify-between p-5 border-b border-zinc-900">
-                <div>
-                  <div className="text-white font-medium">Comments</div>
-
-                  <div className="text-xs text-zinc-500 mt-1">
-                    @{selectedPost.user.username}
-                  </div>
-                </div>
-
+                <div className="text-lg font-medium">Comments</div>
                 <button
                   onClick={() => setShowComments(false)}
                   className="text-zinc-500 hover:text-white transition"
@@ -1068,61 +950,27 @@ export default function Home() {
                   ✕
                 </button>
               </div>
-              {/* POST */}
-              <div className="p-5 border-b border-zinc-900">
-                <div className="text-sm text-zinc-100 leading-7">
-                  {selectedPost.content}
-                </div>
 
-                {selectedPost.image && (
-                  <img
-                    src={selectedPost.image}
-                    className="mt-4 rounded-2xl w-full max-h-[300px] object-cover"
-                  />
-                )}
-              </div>
-              {/* COMMENTS */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-5">
-                {selectedPost.comments.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="text-5xl mb-5">💬</div>
-
-                    <div className="text-white text-lg">No comments yet</div>
-
-                    <div className="text-zinc-500 text-sm mt-2">
-                      Start the conversation
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {selectedPost.comments?.map((c: any) => (
+                  <div key={c.id} className="flex gap-3">
+                    <div className="w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+                      {c.user?.username?.[0]?.toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="text-sm text-white">
+                        @{c.user?.username}
+                      </div>
+                      <div className="text-sm text-zinc-400 mt-1">
+                        {c.content}
+                      </div>
                     </div>
                   </div>
-                ) : (
-                  selectedPost.comments.map((c: any) => (
-                    <div key={c.id} className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white text-xs shrink-0">
-                        {c.user.avatar ? (
-                          <img
-                            src={c.user.avatar}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          c.user.username[0].toUpperCase()
-                        )}
-                      </div>
-
-                      <div>
-                        <div className="text-sm text-white mb-1">
-                          @{c.user.username}
-                        </div>
-
-                        <div className="text-sm text-zinc-300 leading-6">
-                          {c.content}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
+                ))}
               </div>
-              {/* INPUT */}
+
               <div className="p-5 border-t border-zinc-900">
-                <div className="flex items-center gap-3">
+                <div className="flex gap-3">
                   <input
                     value={commentInputs[selectedPost.id] || ""}
                     onChange={(e) =>
@@ -1131,14 +979,12 @@ export default function Home() {
                         [selectedPost.id]: e.target.value,
                       }))
                     }
-                    placeholder="Add a comment..."
+                    placeholder="Write a comment..."
                     className="flex-1 bg-black/40 border border-zinc-900 rounded-2xl px-4 py-3 text-sm outline-none"
                   />
-
                   <button
                     onClick={async () => {
                       await handleComment(selectedPost.id);
-
                       fetchPosts(token);
                     }}
                     className="bg-white text-black px-5 py-3 rounded-2xl text-sm font-medium"
@@ -1150,23 +996,21 @@ export default function Home() {
             </motion.div>
           </motion.div>
         )}
+
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <div className="mx-4 mb-4 bg-zinc-950/90 backdrop-blur-xl border border-zinc-900 rounded-3xl px-6 py-3 flex items-center justify-between">
             <button onClick={() => router.push("/")} className="text-white">
               <House size={22} />
             </button>
-
             <button className="text-zinc-500">
               <Search size={22} />
             </button>
-
             <button
               onClick={() => router.push("/chat")}
               className="text-zinc-500"
             >
               <MessageCircle size={22} />
             </button>
-
             <button
               onClick={() => router.push(`/profile/${me?.username}`)}
               className="text-zinc-500"
@@ -1175,6 +1019,7 @@ export default function Home() {
             </button>
           </div>
         </div>
+
         {editingPost && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -1183,81 +1028,45 @@ export default function Home() {
             className="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{
-                scale: 0.96,
-                opacity: 0,
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-              }}
-              className="w-full max-w-xl bg-zinc-950 border border-zinc-900 rounded-3xl p-6"
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              className="w-full max-w-lg bg-zinc-950 border border-zinc-900 rounded-3xl p-5"
             >
-              <div className="text-xl text-white mb-5">Edit Post</div>
-
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-lg font-medium">Edit Post</div>
+                <button
+                  onClick={() => setEditingPost(null)}
+                  className="text-zinc-500 hover:text-white transition"
+                >
+                  ✕
+                </button>
+              </div>
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full bg-black/40 border border-zinc-900 rounded-2xl p-4 outline-none text-white resize-none min-h-[160px]"
+                className="w-full min-h-[160px] bg-black/40 border border-zinc-900 rounded-2xl p-4 text-white outline-none resize-none"
               />
-
-              <div className="flex items-center justify-end gap-3 mt-5">
-                <button
-                  onClick={() => setEditingPost(null)}
-                  className="px-5 py-3 rounded-2xl text-zinc-400 hover:text-white transition"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={saveEdit}
-                  className="bg-white text-black px-6 py-3 rounded-2xl font-medium"
-                >
-                  Save
-                </button>
-              </div>
+              <button
+                onClick={saveEdit}
+                className="mt-4 w-full bg-white text-black py-3 rounded-2xl font-medium"
+              >
+                Save Changes
+              </button>
             </motion.div>
           </motion.div>
         )}
+
         {selectedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+          <div
+            className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
             onClick={() => setSelectedImage("")}
           >
-            <motion.img
-              initial={{
-                scale: 0.92,
-                opacity: 0,
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 22,
-              }}
+            <img
               src={selectedImage}
-              className="max-w-full max-h-full rounded-3xl object-contain"
-              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-full object-contain"
             />
-
-            <button
-              onClick={() => setSelectedImage("")}
-              className="absolute top-6 right-6 text-white text-3xl"
-            >
-              ✕
-            </button>
-          </motion.div>
+          </div>
         )}
       </div>
     </PageTransition>
