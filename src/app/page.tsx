@@ -371,7 +371,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/chat")}
-              className="bg-white text-black px-5 py-2 rounded-2xl text-sm font-medium hover:opacity-90 transition"
+              className="bg-white text-black px-5 py-2 rounded-2xl text-sm font-medium hover:opacity-90 transition cursor-pointer"
             >
               Messages
             </button>
@@ -484,14 +484,14 @@ export default function Home() {
                 <div className="absolute right-0 top-16 w-52 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden z-50">
                   <button
                     onClick={() => router.push(`/profile/${me?.username}`)}
-                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
+                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white cursor-pointer"
                   >
                     Profile
                   </button>
 
                   <button
                     onClick={() => router.push("/settings")}
-                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white"
+                    className="w-full text-left px-4 py-3 hover:bg-zinc-900 transition text-sm text-white cursor-pointer"
                   >
                     Settings
                   </button>
@@ -505,7 +505,7 @@ export default function Home() {
                         "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                       window.location.href = "/login";
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-red-500/10 transition text-sm text-red-400"
+                    className="w-full text-left px-4 py-3 hover:bg-red-500/10 transition text-sm text-red-400 cursor-pointer"
                   >
                     Log out
                   </button>
@@ -587,7 +587,7 @@ export default function Home() {
                     duration: 0.15,
                   }}
                   onClick={createPost}
-                  className="mt-4 w-full bg-white text-black py-3 rounded-2xl font-medium hover:opacity-90 transition"
+                  className="mt-4 w-full bg-white text-black py-3 rounded-2xl font-medium hover:opacity-90 transition cursor-pointer"
                 >
                   Publish
                 </motion.button>
@@ -753,7 +753,7 @@ export default function Home() {
 
                               <div className="flex items-center gap-5 mt-5">
                                 {/* LIKE */}
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 cursor-pointer">
                                   <motion.button
                                     whileTap={{ scale: 1.25 }}
                                     onClick={() => handleLike(p.id)}
@@ -773,6 +773,7 @@ export default function Home() {
                                     }`}
                                   >
                                     <Heart
+                                      className="cursor-pointer"
                                       size={18}
                                       fill={
                                         p.likes.some(
@@ -796,7 +797,7 @@ export default function Home() {
                                       setSelectedPost(p);
                                       setShowComments(true);
                                     }}
-                                    className="text-zinc-500 hover:text-white transition"
+                                    className="text-zinc-500 hover:text-white transition cursor-pointer"
                                   >
                                     💬
                                   </button>

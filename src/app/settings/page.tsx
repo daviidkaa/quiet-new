@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUploadThing } from "@/lib/uploadthing";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { startUpload } = useUploadThing("imageUploader");
 
   const [username, setUsername] = useState("");
@@ -62,6 +64,26 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-black text-white px-4 md:px-8 py-6">
       <div className="max-w-2xl mx-auto">
+        <button
+          onClick={() => router.back()}
+          className="mb-5 inline-flex items-center gap-2 text-zinc-400 hover:text-white transition"
+          aria-label="Go back"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          <span>Back</span>
+        </button>
         {/* HEADER */}
         <div className="mb-10">
           <h1 className="text-4xl tracking-[0.2em] font-light">settings</h1>
@@ -130,7 +152,7 @@ export default function SettingsPage() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 maxLength={160}
-                className="w-full bg-black/40 border border-zinc-900 rounded-2xl px-4 py-3 outline-none resize-none min-h-[120px] focus:border-zinc-700 transition"
+                className="w-full bg-black/40 border border-zinc-900 rounded-2xl px-4 py-3 outline-none resize-none min-h-30 focus:border-zinc-700 transition"
                 placeholder="Tell people something about yourself..."
               />
 

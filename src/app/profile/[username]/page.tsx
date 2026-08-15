@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage({
   params,
@@ -10,7 +11,7 @@ export default function ProfilePage({
   }>;
 }) {
   const resolvedParams = use(params);
-
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [me, setMe] = useState<any>(null);
@@ -107,6 +108,26 @@ export default function ProfilePage({
       className="min-h-screen bg-black text-white px-4 md:px-8 py-8"
     >
       <div className="max-w-4xl mx-auto">
+        <button
+          onClick={() => router.back()}
+          className="mb-5 inline-flex items-center gap-2 text-zinc-400 hover:text-white transition"
+          aria-label="Go back"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          <span>Back</span>
+        </button>
         {/* Profile Header */}
         <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-8 md:p-10 mb-6">
           <div className="flex flex-col md:flex-row items-center md:items-center gap-8">
