@@ -33,6 +33,8 @@ export default function Home() {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [editingPost, setEditingPost] = useState<any>(null);
   const [editContent, setEditContent] = useState("");
+  const [followingUsers, setFollowingUsers] = useState<Record<number, boolean>>({});
+  const [followingLoading, setFollowingLoading] = useState<number | null>(null);
 
   const { startUpload } = useUploadThing("imageUploader");
   const router = useRouter();
@@ -252,6 +254,11 @@ export default function Home() {
 
     if (Array.isArray(data)) {
       setUsers(data);
+      setFollowingUsers(
+        Object.fromEntries(
+          data.map((user: any) => [user.id, Boolean(user.isFollowing)]),
+        ),
+      );
     }
   }
 
@@ -281,20 +288,40 @@ export default function Home() {
   }
 
   async function followUser(userId: number) {
-    if (!token) return;
+    if (!token || followingLoading === userId) return;
 
-    await fetch("/api/follow", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        followingId: userId,
-      }),
-    });
+    setFollowingLoading(userId);
 
-    toast.success("User followed");
+    try {
+      const res = await fetch("/api/follow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          followingId: userId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || typeof data.following !== "boolean") {
+        toast.error(data.error || "Unable to update follow");
+        return;
+      }
+
+      setFollowingUsers((prev) => ({
+        ...prev,
+        [userId]: data.following,
+      }));
+
+      toast.success(data.following ? "User followed" : "User unfollowed");
+    } catch {
+      toast.error("Unable to update follow");
+    } finally {
+      setFollowingLoading(null);
+    }
   }
 
   useEffect(() => {
@@ -864,18 +891,31 @@ export default function Home() {
 
                     <motion.button
                       whileHover={{
-                        scale: 1.03,
+                        scale: followingLoading === u.id ? 1 : 1.03,
                       }}
                       whileTap={{
-                        scale: 0.96,
+                        scale: followingLoading === u.id ? 1 : 0.96,
                       }}
                       transition={{
                         duration: 0.15,
                       }}
                       onClick={() => followUser(u.id)}
-                      className="bg-white text-black px-5 py-2 rounded-2xl text-sm font-medium hover:opacity-90 transition"
+                      disabled={followingLoading === u.id}
+                      className={`px-5 py-2 rounded-2xl text-sm font-medium transition ${
+                        followingUsers[u.id]
+                          ? "bg-zinc-900 text-white border border-zinc-800 hover:bg-zinc-800"
+                          : "bg-white text-black hover:opacity-90"
+                      } ${
+                        followingLoading === u.id
+                          ? "opacity-60 cursor-wait"
+                          : "cursor-pointer"
+                      }`}
                     >
-                      Follow
+                      {followingLoading === u.id
+                        ? "..."
+                        : followingUsers[u.id]
+                          ? "Following"
+                          : "Follow"}
                     </motion.button>
                   </div>
                 ))}
