@@ -98,6 +98,28 @@ div[class~="w-[340px]"][class~="top-14"] > div:last-child > button > div:last-ch
   font-size: 11px;
 }
 
+/* Mobile new-post composer */
+@media (max-width: 767px) {
+  button:disabled[class~="w-full"][class~="py-3"][class~="rounded-2xl"] {
+    background: #18181b !important;
+    color: #52525b !important;
+    border: 1px solid #27272a !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+  }
+
+  button[class~="w-full"][class~="py-3"][class~="rounded-2xl"]:not(:disabled) {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+  }
+
+  button[class~="w-full"][class~="py-3"][class~="rounded-2xl"]:not(:disabled):active {
+    transform: scale(0.99);
+  }
+}
+
 @media (max-width: 640px) {
   div[class~="w-[340px]"][class~="top-14"] {
     right: 8px !important;
