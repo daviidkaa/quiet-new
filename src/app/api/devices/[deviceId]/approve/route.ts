@@ -7,7 +7,8 @@ export async function POST(
   context: { params: Promise<{ deviceId: string }> },
 ) {
   const user = getUserFromRequest(req as any);
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { deviceId } = await context.params;
   const { approverDeviceId } = await req.json();
@@ -19,7 +20,10 @@ export async function POST(
   });
 
   if (!approver || !pendingDevice) {
-    return NextResponse.json({ error: "Invalid device approval" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid device approval" },
+      { status: 400 },
+    );
   }
 
   const device = await prisma.device.update({
