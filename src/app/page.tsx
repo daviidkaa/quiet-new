@@ -428,9 +428,17 @@ export default function Home() {
             )}
             <button
               onClick={() => setShowProfileMenu((prev) => !prev)}
-              className="w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center text-sm font-medium text-cyan-300 hover:border-zinc-600 transition"
+              className="w-10 h-10 rounded-full overflow-hidden bg-zinc-950 border border-zinc-800 flex items-center justify-center text-sm font-medium text-cyan-300 hover:border-zinc-600 transition"
             >
-              {me?.username?.slice(0, 2).toUpperCase()}
+              {me?.avatar ? (
+                <img
+                  src={me.avatar}
+                  alt=""
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                me?.username?.slice(0, 2).toUpperCase()
+              )}
             </button>
             {showProfileMenu && (
               <div className="absolute right-0 top-14 w-44 bg-zinc-950 border border-zinc-900 rounded-2xl p-2 shadow-2xl z-50">
@@ -562,9 +570,17 @@ export default function Home() {
                             onClick={() =>
                               router.push(`/profile/${p.user.username}`)
                             }
-                            className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sm"
+                            className="w-10 h-10 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sm"
                           >
-                            {p.user?.username?.slice(0, 2).toUpperCase()}
+                            {p.user?.avatar ? (
+                              <img
+                                src={p.user.avatar}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              p.user?.username?.slice(0, 2).toUpperCase()
+                            )}
                           </button>
                           <div>
                             <button
