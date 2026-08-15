@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const currentUser = getUserFromRequest(req as any);
@@ -22,6 +22,15 @@ export async function GET(req: Request) {
         where: { approved: true },
         select: { id: true, publicKey: true, name: true },
       },
+      followers: {
+        where: {
+          followerId: currentUser.userId,
+        },
+        select: {
+          id: true,
+        },
+        take: 1,
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -29,5 +38,10 @@ export async function GET(req: Request) {
     take: 20,
   });
 
-  return NextResponse.json(users);
+  return NextResponse.json(
+    users.map(({ followers, ...user }) => ({
+      ...user,
+      isFollowing: followers.length > 0,
+    })),
+  );
 }
