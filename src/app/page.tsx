@@ -611,11 +611,29 @@ export default function Home() {
                             <div className="absolute right-0 top-10 w-44 bg-zinc-950 border border-zinc-800 rounded-2xl p-1 shadow-2xl z-30">
                               <button
                                 onClick={async () => {
-                                  await navigator.clipboard.writeText(
-                                    `${window.location.origin}/post/${p.id}`,
-                                  );
-                                  setOpenMenu(null);
-                                  toast.success("Post link copied");
+                                  const link = `${window.location.origin}/post/${p.id}`;
+
+                                  try {
+                                    if (navigator.clipboard?.writeText) {
+                                      await navigator.clipboard.writeText(link);
+                                    } else {
+                                      const textarea =
+                                        document.createElement("textarea");
+                                      textarea.value = link;
+                                      textarea.style.position = "fixed";
+                                      textarea.style.opacity = "0";
+                                      document.body.appendChild(textarea);
+                                      textarea.focus();
+                                      textarea.select();
+                                      document.execCommand("copy");
+                                      textarea.remove();
+                                    }
+
+                                    setOpenMenu(null);
+                                    toast.success("Post link copied");
+                                  } catch {
+                                    toast.error("Unable to copy link");
+                                  }
                                 }}
                                 className="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-zinc-900"
                               >
