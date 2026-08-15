@@ -33,7 +33,9 @@ export default function Home() {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [editingPost, setEditingPost] = useState<any>(null);
   const [editContent, setEditContent] = useState("");
-  const [followingUsers, setFollowingUsers] = useState<Record<number, boolean>>({});
+  const [followingUsers, setFollowingUsers] = useState<Record<number, boolean>>(
+    {},
+  );
   const [followingLoading, setFollowingLoading] = useState<number | null>(null);
 
   const { startUpload } = useUploadThing("imageUploader");
@@ -93,7 +95,28 @@ export default function Home() {
 
     const data = await res.json();
 
-    setNotifications(data);
+    if (Array.isArray(data)) {
+      setNotifications(data);
+    }
+  }
+
+  async function markAllNotificationsRead() {
+    if (!token) return;
+
+    const res = await fetch("/api/notifications/read", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      toast.error("Unable to mark notifications as read");
+      return;
+    }
+
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    toast.success("Notifications marked as read");
   }
 
   async function handleComment(postId: number) {
@@ -403,19 +426,7 @@ export default function Home() {
               Messages
             </button>
             <button
-              onClick={async () => {
-                const newState = !showNotifications;
-                setShowNotifications(newState);
-                if (newState && token) {
-                  await fetch("/api/notifications/read", {
-                    method: "POST",
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  setNotifications((prev) =>
-                    prev.map((n) => ({ ...n, read: true })),
-                  );
-                }
-              }}
+              onClick={() => setShowNotifications((prev) => !prev)}
               className="relative text-zinc-400 hover:text-white transition cursor-pointer"
             >
               🔔
@@ -433,12 +444,22 @@ export default function Home() {
                 {/* MODAL */}
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="absolute right-0 top-14 w-[340px] bg-zinc-950 border border-zinc-900 rounded-3xl p-3 shadow-2xl z-50"
+                  className="absolute right-0 top-14 w-[340px] max-w-[calc(100vw-2rem)] bg-zinc-950 border border-zinc-900 rounded-3xl p-3 shadow-2xl z-50"
                 >
-                  <div className="text-sm text-white mb-3 px-2">
-                    Notifications
+                  <div className="flex items-center justify-between gap-3 px-2 mb-3">
+                    <div className="text-sm font-medium text-white">
+                      Notifications
+                    </div>
+                    {notifications.some((n) => !n.read) && (
+                      <button
+                        onClick={markAllNotificationsRead}
+                        className="text-xs text-zinc-500 hover:text-white transition"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
                   </div>
-                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  <div className="space-y-1 max-h-[400px] overflow-y-auto">
                     {notifications.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center py-12">
                         <div className="text-5xl mb-5"> 🔔 </div>
@@ -459,16 +480,48 @@ export default function Home() {
                             }
                             setShowNotifications(false);
                           }}
-                          className="w-full text-left p-3 rounded-2xl hover:bg-zinc-900 transition"
+                          className={`w-full text-left p-3 rounded-2xl transition ${
+                            n.read
+                              ? "hover:bg-zinc-900"
+                              : "bg-zinc-900/60 hover:bg-zinc-900"
+                          }`}
                         >
-                          <div className="text-sm text-white">
-                            @{n.actor.username}{" "}
-                            {n.type === "follow" && "followed you"}
-                            {n.type === "like" && "liked your post"}
-                            {n.type === "comment" && "commented on your post"}
-                          </div>
-                          <div className="text-xs text-zinc-500 mt-1">
-                            {new Date(n.createdAt).toLocaleString()}
+                          <div className="flex items-start gap-3">
+                            <div className="relative shrink-0">
+                              <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xs text-white">
+                                {n.actor?.avatar ? (
+                                  <img
+                                    src={n.actor.avatar}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  n.actor?.username?.[0]?.toUpperCase()
+                                )}
+                              </div>
+                              {!n.read && (
+                                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-white border-2 border-zinc-950" />
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="text-sm text-white leading-5">
+                                <span className="font-medium">
+                                  @{n.actor.username}
+                                </span>{" "}
+                                <span className="text-zinc-300">
+                                  {n.type === "follow" && "followed you"}
+                                  {n.type === "like" && "liked your post"}
+                                  {n.type === "comment" &&
+                                    "commented on your post"}
+                                </span>
+                              </div>
+                              <div className="text-xs text-zinc-600 mt-1">
+                                {formatDistanceToNow(new Date(n.createdAt), {
+                                  addSuffix: true,
+                                })}
+                              </div>
+                            </div>
                           </div>
                         </button>
                       ))
