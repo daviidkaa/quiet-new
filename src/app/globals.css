@@ -25,16 +25,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Quiet notification popover polish */
+/* Quiet notification popover */
 div[class~="w-[340px]"][class~="top-14"] {
-  right: 82px !important;
-  top: 52px !important;
-  width: 380px !important;
+  position: fixed !important;
+  right: 112px !important;
+  top: 76px !important;
+  left: auto !important;
+  width: 360px !important;
   max-width: calc(100vw - 32px);
   padding: 8px !important;
   border-color: #27272a !important;
-  border-radius: 24px !important;
-  background: rgba(9, 9, 11, 0.97) !important;
+  border-radius: 22px !important;
+  background: rgba(9, 9, 11, 0.98) !important;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.02);
   backdrop-filter: blur(18px);
 }
@@ -43,7 +45,7 @@ div[class~="w-[340px]"][class~="top-14"]::before {
   content: "";
   position: absolute;
   top: -6px;
-  right: 92px;
+  right: 112px;
   width: 12px;
   height: 12px;
   background: #09090b;
@@ -64,7 +66,7 @@ div[class~="w-[340px]"][class~="top-14"] > div:first-child {
 }
 
 div[class~="w-[340px]"][class~="top-14"] > div:last-child {
-  max-height: 430px !important;
+  max-height: min(420px, calc(100vh - 150px)) !important;
   padding: 6px 2px 2px;
   scrollbar-width: thin;
 }
@@ -73,17 +75,16 @@ div[class~="w-[340px]"][class~="top-14"] > div:last-child > button {
   position: relative;
   display: block;
   width: 100%;
-  min-height: 68px;
-  padding: 13px 14px 13px 18px !important;
-  border-radius: 18px;
+  min-height: 64px;
+  padding: 12px 14px 12px 18px !important;
+  border-radius: 16px;
   border: 1px solid transparent;
-  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, border-color 160ms ease;
 }
 
 div[class~="w-[340px]"][class~="top-14"] > div:last-child > button:hover {
   background: #18181b !important;
   border-color: #27272a;
-  transform: translateY(-1px);
 }
 
 div[class~="w-[340px]"][class~="top-14"] > div:last-child > button > div:first-child {
@@ -100,11 +101,11 @@ div[class~="w-[340px]"][class~="top-14"] > div:last-child > button > div:last-ch
 @media (max-width: 640px) {
   div[class~="w-[340px]"][class~="top-14"] {
     right: 8px !important;
-    top: 48px !important;
-    width: min(380px, calc(100vw - 16px)) !important;
+    top: 68px !important;
+    width: min(360px, calc(100vw - 16px)) !important;
   }
 
   div[class~="w-[340px]"][class~="top-14"]::before {
-    right: 38px;
+    right: 34px;
   }
 }
