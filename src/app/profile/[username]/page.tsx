@@ -248,32 +248,52 @@ export default function ProfilePage({
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {posts.map((p) => (
-              <div
+              <motion.article
                 key={p.id}
-                className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 hover:border-zinc-800 transition"
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.18 }}
+                className="group overflow-hidden bg-zinc-950 border border-zinc-900 rounded-3xl hover:border-zinc-800 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs text-zinc-600">
-                    {p.createdAt ? formatPostDate(p.createdAt) : ""}
+                <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+                    <span className="text-xs text-zinc-500">
+                      {p.createdAt ? formatPostDate(p.createdAt) : ""}
+                    </span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-zinc-700">
+                    quiet moment
                   </span>
                 </div>
 
                 {p.content && (
-                  <div className="text-zinc-100 leading-7 whitespace-pre-wrap">{p.content}</div>
+                  <div className="px-6 pb-5">
+                    <p className="text-[15px] text-zinc-100 leading-7 whitespace-pre-wrap">
+                      {p.content}
+                    </p>
+                  </div>
                 )}
 
                 {p.image && (
-                  <div className={`${p.content ? "mt-5" : "mt-0"} flex justify-center`}>
-                    <img
-                      src={p.image}
-                      alt="Post"
-                      className="rounded-2xl border border-zinc-900 w-full md:max-w-3xl max-h-[600px] object-cover"
-                    />
+                  <div className={`${p.content ? "px-5 pb-5" : "px-5 pb-5 pt-1"}`}>
+                    <div className="overflow-hidden rounded-2xl border border-zinc-900 bg-black">
+                      <img
+                        src={p.image}
+                        alt="Post"
+                        className="block w-full max-h-[560px] object-contain transition-transform duration-500 group-hover:scale-[1.01]"
+                      />
+                    </div>
                   </div>
                 )}
-              </div>
+
+                <div className="h-px bg-zinc-900/80 mx-6" />
+                <div className="px-6 py-3 flex items-center justify-between">
+                  <span className="text-xs text-zinc-700">@{user.username}</span>
+                  <span className="text-xs text-zinc-700">#{p.id}</span>
+                </div>
+              </motion.article>
             ))}
           </div>
         )}
