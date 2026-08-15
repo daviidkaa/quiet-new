@@ -28,10 +28,10 @@ body {
 /* Quiet notification popover */
 div[class~="w-[340px]"][class~="top-14"] {
   position: fixed !important;
-  right: 112px !important;
+  right: 70px !important;
   top: 76px !important;
   left: auto !important;
-  width: 360px !important;
+  width: 320px !important;
   max-width: calc(100vw - 32px);
   padding: 8px !important;
   border-color: #27272a !important;
@@ -45,7 +45,7 @@ div[class~="w-[340px]"][class~="top-14"]::before {
   content: "";
   position: absolute;
   top: -6px;
-  right: 112px;
+  right: 60px;
   width: 12px;
   height: 12px;
   background: #09090b;
@@ -102,7 +102,7 @@ div[class~="w-[340px]"][class~="top-14"] > div:last-child > button > div:last-ch
   div[class~="w-[340px]"][class~="top-14"] {
     right: 8px !important;
     top: 68px !important;
-    width: min(360px, calc(100vw - 16px)) !important;
+    width: min(320px, calc(100vw - 16px)) !important;
   }
 
   div[class~="w-[340px]"][class~="top-14"]::before {
