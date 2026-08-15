@@ -47,6 +47,25 @@ export default function ProfilePage({
       },
     });
   }
+
+  function formatPostDate(date: string) {
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+
+    return new Date(date).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: new Date(date).getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+    });
+  }
+
   useEffect(() => {
     async function fetchProfile() {
       const token = localStorage.getItem("token");
@@ -92,6 +111,8 @@ export default function ProfilePage({
     );
   }
 
+  const isOwnProfile = me?.id === user.id;
+
   return (
     <motion.div
       initial={{
@@ -128,13 +149,14 @@ export default function ProfilePage({
           </svg>
           <span>Back</span>
         </button>
-        {/* Profile Header */}
-        <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-8 md:p-10 mb-6">
-          <div className="flex flex-col md:flex-row items-center md:items-center gap-8">
-            <div className="w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center text-4xl">
+
+        <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 md:p-8 mb-7">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center text-4xl">
               {user.avatar ? (
                 <img
                   src={user.avatar}
+                  alt={`${user.username}'s avatar`}
                   className="w-full h-full object-contain bg-black"
                 />
               ) : (
@@ -142,69 +164,85 @@ export default function ProfilePage({
               )}
             </div>
 
-            <div className="text-center md:text-left">
-              <div className="text-3xl md:text-4xl font-semibold text-center md:text-left">
-                @{user.username}
+            <div className="flex-1 min-w-0 text-center md:text-left">
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+                <div className="text-3xl md:text-4xl font-semibold tracking-tight">
+                  @{user.username}
+                </div>
+
+                {isOwnProfile ? (
+                  <button
+                    onClick={() => router.push("/settings")}
+                    className="self-center md:self-auto px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-900/60 text-sm text-zinc-200 hover:bg-zinc-800 hover:border-zinc-700 transition"
+                  >
+                    Edit profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleFollow}
+                    className={`self-center md:self-auto px-5 py-2 rounded-xl text-sm font-medium transition ${
+                      isFollowing
+                        ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                        : "bg-white text-black hover:bg-zinc-200"
+                    }`}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                )}
               </div>
 
-              <div className="text-zinc-500 mt-2">
+              <div className="text-zinc-400 mt-2 max-w-xl">
                 {user.bio || "No bio yet"}
               </div>
-              <div className="text-xs text-zinc-600 mt-3">
-                {user?.lastActive &&
-                Date.now() - new Date(user.lastActive).getTime() < 1000 * 60 * 5
-                  ? "online now"
-                  : "offline"}
-              </div>
-              {me?.id !== user.id && (
-                <button
-                  onClick={handleFollow}
-                  className={`mt-5 px-5 py-2 rounded-2xl text-sm font-medium transition ${
-                    isFollowing
-                      ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                      : "bg-white text-black hover:opacity-90"
+
+              <div className="flex items-center justify-center md:justify-start gap-2 text-xs text-zinc-600 mt-3">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    user?.lastActive &&
+                    Date.now() - new Date(user.lastActive).getTime() < 1000 * 60 * 5
+                      ? "bg-emerald-400"
+                      : "bg-zinc-700"
                   }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
-              )}
+                />
+                <span>
+                  {user?.lastActive &&
+                  Date.now() - new Date(user.lastActive).getTime() < 1000 * 60 * 5
+                    ? "online now"
+                    : "offline"}
+                </span>
+              </div>
 
-              <div className="flex items-center gap-10 mt-6">
-                <div>
-                  <div className="text-white text-lg font-medium">
-                    {user._count.posts}
-                  </div>
-
+              <div className="grid grid-cols-3 max-w-md mt-7 border-y border-zinc-900 py-4">
+                <div className="text-center md:text-left">
+                  <div className="text-white text-lg font-semibold">{user._count.posts}</div>
                   <div className="text-zinc-500 text-xs mt-1">posts</div>
                 </div>
-
-                <div>
-                  <div className="text-white text-lg font-medium">
-                    {user._count.followers}
-                  </div>
-
+                <div className="text-center md:text-left border-x border-zinc-900 px-4">
+                  <div className="text-white text-lg font-semibold">{user._count.followers}</div>
                   <div className="text-zinc-500 text-xs mt-1">followers</div>
                 </div>
-
-                <div>
-                  <div className="text-white text-lg font-medium">
-                    {user._count.following}
-                  </div>
-
+                <div className="text-center md:text-left pl-4">
+                  <div className="text-white text-lg font-semibold">{user._count.following}</div>
                   <div className="text-zinc-500 text-xs mt-1">following</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="text-zinc-500 text-sm mb-4 mt-10">Posts</div>
-        {/* POSTS */}
+
+        <div className="flex items-end justify-between mb-4 mt-8">
+          <div>
+            <div className="text-white font-medium">Posts</div>
+            <div className="text-zinc-600 text-xs mt-1">
+              {user._count.posts} {user._count.posts === 1 ? "post" : "posts"}
+            </div>
+          </div>
+        </div>
+
         {posts.length === 0 ? (
           <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-10 text-center">
             <div className="text-5xl mb-5">🖤</div>
-
             <div className="text-white text-lg">No posts yet</div>
-
             <div className="text-zinc-500 text-sm mt-2">
               Share your first quiet moment
             </div>
@@ -216,14 +254,21 @@ export default function ProfilePage({
                 key={p.id}
                 className="bg-zinc-950 border border-zinc-900 rounded-3xl p-6 hover:border-zinc-800 transition"
               >
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs text-zinc-600">
+                    {p.createdAt ? formatPostDate(p.createdAt) : ""}
+                  </span>
+                </div>
+
                 {p.content && (
-                  <div className="text-zinc-100 leading-7">{p.content}</div>
+                  <div className="text-zinc-100 leading-7 whitespace-pre-wrap">{p.content}</div>
                 )}
 
                 {p.image && (
-                  <div className="mt-5 flex justify-center">
+                  <div className={`${p.content ? "mt-5" : "mt-0"} flex justify-center`}>
                     <img
                       src={p.image}
+                      alt="Post"
                       className="rounded-2xl border border-zinc-900 w-full md:max-w-3xl max-h-[600px] object-cover"
                     />
                   </div>
